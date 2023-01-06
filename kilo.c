@@ -789,44 +789,50 @@ void editorDrawRows(struct a_buf *ab) {
         		int welcomelen = snprintf(welcome, sizeof(welcome),
           		"Kilo editor -- version %s", KILO_VERSION);
       
-        		if (welcomelen > E.screen_columns) welcomelen = E.screen_columns;
-        		int padding = (E.screen_columns - welcomelen) / 2;
+      		  	if (welcomelen > E.screen_columns) welcomelen = E.screen_columns;
+       		 	int padding = (E.screen_columns - welcomelen) / 2;
 
-        		if (padding) {
+	        	if (padding) {
 	  				abAppend(ab, "~", 1);
 	  				padding--;
-        		}
+ 		       	}
       
-        		while (padding--) abAppend(ab, " ", 1);
-        		abAppend(ab, welcome, welcomelen);
+   		     	while (padding--) abAppend(ab, " ", 1);
+     		   	abAppend(ab, welcome, welcomelen);
       		} else {
         		abAppend(ab, "~", 1);
       		}
     	} else {
-      		int len = E.row[file_row].rsize - E.col_off;
+ 	 		int len = E.row[file_row].rsize - E.col_off;
 			if (len < 0) len = 0;
-      		if (len > E.screen_columns) len = E.screen_columns;
-      		char *c = &E.row[file_row].render[E.col_off];
+    		if (len > E.screen_columns) len = E.screen_columns;
+
+   	   		char *c = &E.row[file_row].render[E.col_off];
 			unsigned char *hl = &E.row[file_row].hl[E.col_off];
+
 			int current_color = -1;
 			int j;
+		
 			for (j = 0; j < len; j++) {
 				if (iscntrl(c[j])) {
 					char sym = (c[j] <= 26) ? '@' + c[j] : '?';
 					abAppend(ab, "\x1b[7m", 4);
 					abAppend(ab, &sym, 1);
 					abAppend(ab, "\x1b[m", 3);
+
 					if (current_color != -1) {
 						char buf[16];
 						int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", current_color);
 						abAppend(ab, buf, clen);
 					}
+
 				} else if (hl[j] == HL_NORMAL) {
 					if (current_color != -1) {
 						abAppend(ab, "\x1b[39m", 5);
 						current_color = -1;
 					}
 					abAppend(ab, &c[j], 1);
+
 				} else {
 					int color = editorSyntaxToColor(hl[j]);
 					if (color != current_color) {
@@ -835,6 +841,7 @@ void editorDrawRows(struct a_buf *ab) {
 						int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", color);
 						abAppend(ab, buf, clen);
 					}
+
 					abAppend(ab, &c[j], 1);
 				}
 			}
